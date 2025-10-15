@@ -20,75 +20,78 @@ class SignInFormPage extends StatelessWidget {
           ),
           Align(
             alignment: Alignment.center,
-            child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 780,
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/icons/logo.png',
-                      scale: 1.7,
-                    ),
-                    SizedBox(height: 20,),
-                    Text(
-                      "Welcome back",
-                      style: const TextStyle(
-                        fontFamily: 'InstrumentSans',
-                        color: Colors.black,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+            child: Padding(
+              padding: EdgeInsets.only(top: 50),
+              child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 780,
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        'assets/icons/logo.png',
+                        scale: 1.7,
                       ),
-                    ),
-                    SizedBox(height: 40,),
-                    AccountInputField(
-                      fieldHint: "Username",
-                      hideFieldToggle: false,
-                    ),
-                    SizedBox(height: 20,),
-                    AccountInputField(
-                      fieldHint: "Password",
-                      hideFieldToggle: true,
-                    ),
-                    SizedBox(height: 10,),
-                    Container(
-                      width: MediaQuery.of(context).size.width - 70,
-                      height: 30,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          "Forgot password?",
-                          style: const TextStyle(
-                            fontFamily: 'InstrumentSans',
-                            color: Color.fromRGBO(155, 155, 155, 1),
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      SizedBox(height: 20,),
+                      Text(
+                        "Welcome back",
+                        style: const TextStyle(
+                          fontFamily: 'InstrumentSans',
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      SizedBox(height: 40,),
+                      AccountInputField(
+                        fieldHint: "Username",
+                        hideFieldToggle: false,
+                      ),
+                      SizedBox(height: 20,),
+                      AccountInputField(
+                        fieldHint: "Password",
+                        hideFieldToggle: true,
+                      ),
+                      SizedBox(height: 10,),
+                      Container(
+                          width: MediaQuery.of(context).size.width - 70,
+                          height: 30,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              "Forgot password?",
+                              style: const TextStyle(
+                                fontFamily: 'InstrumentSans',
+                                color: Color.fromRGBO(155, 155, 155, 1),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                      ),
+                      SizedBox(height: 20,),
+                      AccountProceedButton(active: true),
+                      SizedBox(height: 70,),
+                      AlternateOptionBorder(),
+                      SizedBox(height: 30,),
+                      AlternateSignUpButton(
+                        buttonText: "Log in with Google",
+                        buttonIcon: 'assets/icons/googleSignin.png',
+                        thirdPartyLogin: true,
+                      ),
+                      SizedBox(height: 20,),
+                      AlternateSignUpButton(
+                        buttonText: "Log in with Apple",
+                        buttonIcon: 'assets/icons/appleSignin.png',
+                        thirdPartyLogin: true,
+                      ),
+                      SizedBox(height: 20,),
+                      AlternateSignUpButton(
+                        buttonText: "Sign up",
+                        thirdPartyLogin: false,
                       )
-                    ),
-                    SizedBox(height: 20,),
-                    AccountProceedButton(active: true),
-                    SizedBox(height: 70,),
-                    AlternateOptionBorder(),
-                    SizedBox(height: 30,),
-                    AlternateSignUpButton(
-                      buttonText: "Log in with Google",
-                      buttonIcon: 'assets/icons/googleSignin.png',
-                      thirdPartyLogin: true,
-                    ),
-                    SizedBox(height: 20,),
-                    AlternateSignUpButton(
-                      buttonText: "Log in with Apple",
-                      buttonIcon: 'assets/icons/appleSignin.png',
-                      thirdPartyLogin: true,
-                    ),
-                    SizedBox(height: 20,),
-                    AlternateSignUpButton(
-                      buttonText: "Sign up",
-                      thirdPartyLogin: false,
-                    )
-                  ],
-                )
+                    ],
+                  )
+              )
             )
           )
         ],
@@ -132,11 +135,11 @@ class _AlternateSignUpButton extends State<AlternateSignUpButton> {
           children: [
             if (widget.thirdPartyLogin)
               Container(
-                  width: 30,
-                  height: 30,
+                  width: 28,
+                  height: 28,
                   child: Image.asset(widget.buttonIcon.toString(), scale: 2)
               ),
-              SizedBox(width: 10,),
+              SizedBox(width: 12,),
             Text(
               widget.buttonText.toString(),
               style: const TextStyle(
