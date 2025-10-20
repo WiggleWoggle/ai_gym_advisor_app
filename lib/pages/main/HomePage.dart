@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,7 +30,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 130),
                 RoutineWidget(),
                 SizedBox(height: 40),
-                CalendarWidget(),
+                CalendarWidget(dayValues: [100, 40, 70, 30, 80, 15, 60],),
               ],
             ),
           ),
@@ -88,11 +89,29 @@ class _RoutineWidgetState extends State<RoutineWidget> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 20),
-                    child: Icon(Icons.arrow_forward_ios_rounded, color: Color.fromRGBO(75, 75, 75, 1), size: 20,)
-                  )
+                    child: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: Color.fromRGBO(75, 75, 75, 1),
+                      size: 20,
+                    ),
+                  ),
                 ],
               ),
-            )
+            ),
+          ),
+          SizedBox(height: 30,),
+          DynamicPieChartWidget(
+            chartTitle: "Days left in routine",
+            chartSubtext: "Keep going!",
+            currentValue: 67,
+            totalValue: 120,
+          ),
+          SizedBox(height: 30,),
+          DynamicPieChartWidget(
+            chartTitle: "Calories burned",
+            chartSubtext: "340 target",
+            currentValue: 128,
+            totalValue: 340,
           ),
         ],
       ),
@@ -100,8 +119,116 @@ class _RoutineWidgetState extends State<RoutineWidget> {
   }
 }
 
+class DynamicPieChartWidget extends StatefulWidget {
+
+  final String chartTitle;
+  final String chartSubtext;
+  final int currentValue;
+  final int totalValue;
+
+  const DynamicPieChartWidget({super.key, required this.chartTitle, required this.chartSubtext, required this.currentValue, required this.totalValue});
+
+  @override
+  State<DynamicPieChartWidget> createState() => _DynamicPieChartWidgetState();
+}
+
+class _DynamicPieChartWidgetState extends State<DynamicPieChartWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+
+    double radius = 80;
+
+    return Container(
+      width: 320,
+      height: 80,
+      child: Row(
+        children: [
+          Container(
+            width: radius,
+            height: radius,
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(90)),
+                    color: Color.fromRGBO(212, 212, 212, 1)
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(90)),
+                    gradient: RadialGradient(
+                      colors: [Colors.white, Color.fromRGBO(166, 173, 253, 1)],
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Container(
+                    width: radius - 12,
+                    height: radius - 12,
+                    decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.all(Radius.circular(90)),
+                        color: Colors.white
+                    ),
+                    child: Center(
+                      child: Text(
+                        widget.currentValue.toString(),
+                        style: const TextStyle(
+                          fontFamily: 'InstrumentSans',
+                          color: Color.fromRGBO(172, 178, 253, 1),
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 15),
+            child: Container(
+                width: 200,
+                height: 100,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.chartTitle,
+                      style: const TextStyle(
+                        fontFamily: 'InstrumentSans',
+                        color: Color.fromRGBO(172, 178, 253, 1),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                     widget.chartSubtext,
+                      style: const TextStyle(
+                        fontFamily: 'InstrumentSans',
+                        color: Color.fromRGBO(100, 100, 100, 1),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                )
+            )
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class CalendarWidget extends StatefulWidget {
-  const CalendarWidget({super.key});
+
+  final List<int> dayValues;
+
+  const CalendarWidget({super.key, required this.dayValues});
 
   @override
   State<CalendarWidget> createState() => _CalendarWidgetState();
@@ -167,13 +294,13 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    BarGraphBarWidget(dayProgressPercent: 100),
-                    BarGraphBarWidget(dayProgressPercent: 40),
-                    BarGraphBarWidget(dayProgressPercent: 70),
-                    BarGraphBarWidget(dayProgressPercent: 30),
-                    BarGraphBarWidget(dayProgressPercent: 80),
-                    BarGraphBarWidget(dayProgressPercent: 15),
-                    BarGraphBarWidget(dayProgressPercent: 60),
+                    BarGraphBarWidget(dayProgressPercent: widget.dayValues[0]),
+                    BarGraphBarWidget(dayProgressPercent: widget.dayValues[1]),
+                    BarGraphBarWidget(dayProgressPercent: widget.dayValues[2]),
+                    BarGraphBarWidget(dayProgressPercent: widget.dayValues[3]),
+                    BarGraphBarWidget(dayProgressPercent: widget.dayValues[4]),
+                    BarGraphBarWidget(dayProgressPercent: widget.dayValues[5]),
+                    BarGraphBarWidget(dayProgressPercent: widget.dayValues[6]),
                   ],
                 ),
               ],
