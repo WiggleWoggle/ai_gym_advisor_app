@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 
-class SignInFormPage extends StatelessWidget {
-
+class SignInFormPage extends StatefulWidget {
   const SignInFormPage({super.key});
+
+  @override
+  State<SignInFormPage> createState() => _SignInFormPageState();
+}
+
+class _SignInFormPageState extends State<SignInFormPage> {
+  bool loginView = true;
+
+  void switchView() {
+    setState(() {
+      loginView = !loginView;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +22,7 @@ class SignInFormPage extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment(0.0, 1.7),
                 end: Alignment(0.0, 0.2),
@@ -18,84 +30,192 @@ class SignInFormPage extends StatelessWidget {
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: EdgeInsets.only(top: 50),
-              child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 780,
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        'assets/icons/logo.png',
-                        scale: 1.7,
-                      ),
-                      SizedBox(height: 20,),
-                      Text(
-                        "Welcome back",
-                        style: const TextStyle(
-                          fontFamily: 'InstrumentSans',
-                          color: Colors.black,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 40,),
-                      AccountInputField(
-                        fieldHint: "Username",
-                        hideFieldToggle: false,
-                      ),
-                      SizedBox(height: 20,),
-                      AccountInputField(
-                        fieldHint: "Password",
-                        hideFieldToggle: true,
-                      ),
-                      SizedBox(height: 10,),
-                      Container(
-                          width: MediaQuery.of(context).size.width - 70,
-                          height: 30,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "Forgot password?",
-                              style: const TextStyle(
-                                fontFamily: 'InstrumentSans',
-                                color: Color.fromRGBO(155, 155, 155, 1),
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                      ),
-                      SizedBox(height: 20,),
-                      AccountProceedButton(active: true),
-                      SizedBox(height: 70,),
-                      AlternateOptionBorder(),
-                      SizedBox(height: 30,),
-                      AlternateSignUpButton(
-                        buttonText: "Log in with Google",
-                        buttonIcon: 'assets/icons/googleSignin.png',
-                        thirdPartyLogin: true,
-                      ),
-                      SizedBox(height: 20,),
-                      AlternateSignUpButton(
-                        buttonText: "Log in with Apple",
-                        buttonIcon: 'assets/icons/appleSignin.png',
-                        thirdPartyLogin: true,
-                      ),
-                      SizedBox(height: 20,),
-                      AlternateSignUpButton(
-                        buttonText: "Sign up",
-                        thirdPartyLogin: false,
-                      )
-                    ],
-                  )
-              )
+          SingleChildScrollView(
+            child: AnimatedSwitcher(
+              switchInCurve: Curves.easeInOutCubic,
+              switchOutCurve: Curves.easeInOutCubic,
+              duration: Duration(milliseconds: 600),
+              transitionBuilder: (child, animation) {
+                final isLogin = child.key == const ValueKey('loginForm');
+
+                final offsetAnimation = Tween<Offset>(
+                  begin: isLogin
+                      ? const Offset(-1.0, 0.0)
+                      : const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(animation);
+
+                return SlideTransition(
+                  position: offsetAnimation,
+                  child: child,
+                );
+              },
+
+              child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView,)
+                  : SignupForm(key: const ValueKey('signupForm'), swapViewMethod: switchView,
+              ),
             )
-          )
+          ),
         ],
-      )
+      ),
+    );
+  }
+}
+
+class SignupForm extends StatelessWidget {
+
+  final VoidCallback? swapViewMethod;
+
+  const SignupForm({super.key, this.swapViewMethod});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+        alignment: Alignment.center,
+        child: Padding(
+            padding: EdgeInsets.only(top: 100),
+            child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 780,
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/icons/logo.png',
+                      scale: 1.7,
+                    ),
+                    SizedBox(height: 20,),
+                    Text(
+                      "Welcome to GymAdvisor.",
+                      style: const TextStyle(
+                        fontFamily: 'InstrumentSans',
+                        color: Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 40,),
+                    AccountInputField(
+                      fieldHint: "Username",
+                      hideFieldToggle: false,
+                    ),
+                    SizedBox(height: 20,),
+                    AccountInputField(
+                      fieldHint: "Password",
+                      hideFieldToggle: false,
+                    ),
+                    SizedBox(height: 20,),
+                    AccountInputField(
+                      fieldHint: "Repeat Password",
+                      hideFieldToggle: false,
+                    ),
+                    SizedBox(height: 40,),
+                    AccountProceedButton(
+                      active: true,
+                      buttonText: "Sign up",
+                    ),
+                    SizedBox(height: 45,),
+                    AlternateOptionBorder(),
+                    SizedBox(height: 45,),
+                    AlternateSignUpButton(
+                      buttonText: "Log in",
+                      thirdPartyLogin: false,
+                      onTap: swapViewMethod,
+                    ),
+                  ],
+                )
+            )
+        )
+    );
+  }
+}
+
+class LoginForm extends StatelessWidget {
+
+  final VoidCallback? swapViewMethod;
+
+  const LoginForm({super.key, this.swapViewMethod});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+        alignment: Alignment.center,
+        child: Padding(
+            padding: EdgeInsets.only(top: 100),
+            child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 780,
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/icons/logo.png',
+                      scale: 1.7,
+                    ),
+                    SizedBox(height: 20,),
+                    Text(
+                      "Welcome back.",
+                      style: const TextStyle(
+                        fontFamily: 'InstrumentSans',
+                        color: Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 40,),
+                    AccountInputField(
+                      fieldHint: "Username",
+                      hideFieldToggle: false,
+                    ),
+                    SizedBox(height: 20,),
+                    AccountInputField(
+                      fieldHint: "Password",
+                      hideFieldToggle: true,
+                    ),
+                    SizedBox(height: 10,),
+                    Container(
+                        width: MediaQuery.of(context).size.width - 70,
+                        height: 30,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Forgot password?",
+                            style: const TextStyle(
+                              fontFamily: 'InstrumentSans',
+                              color: Color.fromRGBO(155, 155, 155, 1),
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )
+                    ),
+                    SizedBox(height: 20,),
+                    AccountProceedButton(
+                        active: true,
+                        buttonText: "Log in",
+                    ),
+                    SizedBox(height: 45,),
+                    AlternateOptionBorder(),
+                    SizedBox(height: 45,),
+                    AlternateSignUpButton(
+                      buttonText: "Log in with Google",
+                      buttonIcon: 'assets/icons/googleSignin.png',
+                      thirdPartyLogin: true,
+                    ),
+                    SizedBox(height: 20,),
+                    AlternateSignUpButton(
+                      buttonText: "Log in with Apple",
+                      buttonIcon: 'assets/icons/appleSignin.png',
+                      thirdPartyLogin: true,
+                    ),
+                    SizedBox(height: 20,),
+                    AlternateSignUpButton(
+                      buttonText: "Sign up",
+                      thirdPartyLogin: false,
+                      onTap: swapViewMethod,
+                    )
+                  ],
+                )
+            )
+        )
     );
   }
 }
@@ -105,8 +225,9 @@ class AlternateSignUpButton extends StatefulWidget {
   final bool thirdPartyLogin;
   final String buttonText;
   final String? buttonIcon;
+  final VoidCallback? onTap;
 
-  AlternateSignUpButton({Key? key, required this.buttonText, this.buttonIcon, required this.thirdPartyLogin}) : super(key: key);
+  AlternateSignUpButton({Key? key, required this.buttonText, this.buttonIcon, required this.thirdPartyLogin, this.onTap}) : super(key: key);
 
   @override
   State<AlternateSignUpButton> createState() => _AlternateSignUpButton();
@@ -116,41 +237,44 @@ class _AlternateSignUpButton extends State<AlternateSignUpButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: Border.all(
-          color: Color.fromRGBO(172, 172, 172, 1.0),
-          width: 1.5,
-          style: BorderStyle.solid,
-        ),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      width: 360,
-      height: 55,
-      child: Align(
-        alignment: Alignment.center,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (widget.thirdPartyLogin)
-              Container(
-                  width: 28,
-                  height: 28,
-                  child: Image.asset(widget.buttonIcon.toString(), scale: 2)
-              ),
-              SizedBox(width: 12,),
-            Text(
-              widget.buttonText.toString(),
-              style: const TextStyle(
-                fontFamily: 'InstrumentSans',
-                color: Color.fromRGBO(105, 93, 93, 1),
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            border: Border.all(
+              color: Color.fromRGBO(172, 172, 172, 1.0),
+              width: 1.5,
+              style: BorderStyle.solid,
             ),
-          ],
-        )
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+          ),
+          width: 360,
+          height: 55,
+          child: Align(
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (widget.thirdPartyLogin)
+                    Container(
+                        width: 28,
+                        height: 28,
+                        child: Image.asset(widget.buttonIcon.toString(), scale: 2)
+                    ),
+                  SizedBox(width: 12,),
+                  Text(
+                    widget.buttonText.toString(),
+                    style: const TextStyle(
+                      fontFamily: 'InstrumentSans',
+                      color: Color.fromRGBO(105, 93, 93, 1),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              )
+          )
       )
     );
   }
@@ -196,8 +320,10 @@ class AlternateOptionBorder extends StatelessWidget {
 class AccountProceedButton extends StatefulWidget {
 
   final bool active;
+  final String buttonText;
+  final VoidCallback? onTap;
 
-  AccountProceedButton({Key? key, required this.active}) : super(key: key);
+  AccountProceedButton({Key? key, required this.active, required this.buttonText, this.onTap}) : super(key: key);
 
   @override
   State<AccountProceedButton> createState() => _AccountProceedButton();
@@ -208,25 +334,28 @@ class _AccountProceedButton extends State<AccountProceedButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 70,
-      height: 50,
-      decoration: BoxDecoration(
-        color: widget.active ? Color.fromRGBO(166, 173, 253, 1.0) : Color.fromRGBO(171, 171, 171, 1.0),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Align(
-        alignment: Alignment.center,
-        child: Text(
-          "Log in",
-          style: const TextStyle(
-            fontFamily: 'InstrumentSans',
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+          width: MediaQuery.of(context).size.width - 70,
+          height: 50,
+          decoration: BoxDecoration(
+            color: widget.active ? Color.fromRGBO(166, 173, 253, 1.0) : Color.fromRGBO(171, 171, 171, 1.0),
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
-        ),
-      )
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              widget.buttonText,
+              style: const TextStyle(
+                fontFamily: 'InstrumentSans',
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          )
+      ),
     );
   }
 }
