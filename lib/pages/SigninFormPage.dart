@@ -35,29 +35,83 @@ class _SignInFormPageState extends State<SignInFormPage> {
             ),
           ),
           SingleChildScrollView(
-            child: AnimatedSwitcher(
-              switchInCurve: Curves.easeInOutCubic,
-              switchOutCurve: Curves.easeInOutCubic,
-              duration: Duration(milliseconds: 600),
-              transitionBuilder: (child, animation) {
-                final isLogin = child.key == const ValueKey('loginForm');
+            child: Column(
+              children: [
+                SizedBox(height: 90,),
+                Image.asset(
+                  'assets/icons/logo.png',
+                  scale: 1.7,
+                ),
+                SizedBox(height: 20,),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    AnimatedSlide(
+                        offset: Offset(0, loginView ? 0 : 1),
+                        duration: Duration(milliseconds: 400),
+                        curve: Curves.easeInOutCubic,
+                        child: AnimatedOpacity(
+                          opacity: loginView ? 1 : 0,
+                          duration: Duration(milliseconds: 400),
+                          curve: Curves.easeInOutCubic,
+                          child: Text(
+                            "Welcome back.",
+                            style: const TextStyle(
+                              fontFamily: 'InstrumentSans',
+                              color: Colors.black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )
+                    ),
+                    AnimatedSlide(
+                        offset: Offset(0, loginView ? 1 : 0),
+                        duration: Duration(milliseconds: 400),
+                        curve: Curves.easeInOutCubic,
+                        child: AnimatedOpacity(
+                          opacity: loginView ? 0 : 1,
+                          duration: Duration(milliseconds: 400),
+                          curve: Curves.easeInOutCubic,
+                          child: Text(
+                            "Welcome to GymAdvisor.",
+                            style: const TextStyle(
+                              fontFamily: 'InstrumentSans',
+                              color: Colors.black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )
+                    ),
+                  ],
+                ),
+                SizedBox(height: 50,),
+                AnimatedSwitcher(
+                  switchInCurve: Curves.easeInOutCubic,
+                  switchOutCurve: Curves.easeInOutCubic,
+                  duration: Duration(milliseconds: 600),
+                  transitionBuilder: (child, animation) {
+                    final isLogin = child.key == const ValueKey('loginForm');
 
-                final offsetAnimation = Tween<Offset>(
-                  begin: isLogin
-                      ? const Offset(-1.0, 0.0)
-                      : const Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(animation);
+                    final offsetAnimation = Tween<Offset>(
+                      begin: isLogin
+                          ? const Offset(-1.0, 0.0)
+                          : const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation);
 
-                return SlideTransition(
-                  position: offsetAnimation,
-                  child: child,
-                );
-              },
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
 
-              child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView, updateFormCompletion: widget.updateFormCompletion,)
-                  : SignupForm(key: const ValueKey('signupForm'), swapViewMethod: switchView,
-              ),
+                  child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView, updateFormCompletion: widget.updateFormCompletion,)
+                      : SignupForm(key: const ValueKey('signupForm'), swapViewMethod: switchView,
+                  ),
+                )
+              ],
             )
           ),
         ],
@@ -72,64 +126,48 @@ class SignupForm extends StatelessWidget {
 
   const SignupForm({super.key, this.swapViewMethod});
 
+  void _formCompleted(bool completed) {
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
         alignment: Alignment.center,
-        child: Padding(
-            padding: EdgeInsets.only(top: 100),
-            child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 780,
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/icons/logo.png',
-                      scale: 1.7,
-                    ),
-                    SizedBox(height: 20,),
-                    Text(
-                      "Welcome to GymAdvisor.",
-                      style: const TextStyle(
-                        fontFamily: 'InstrumentSans',
-                        color: Colors.black,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 40,),
-                    AccountInputField(
-                      fieldHint: "Username",
-                      hideFieldToggle: false,
-                    ),
-                    SizedBox(height: 20,),
-                    AccountInputField(
-                      fieldHint: "Password",
-                      hideFieldToggle: false,
-                    ),
-                    SizedBox(height: 20,),
-                    AccountInputField(
-                      fieldHint: "Repeat Password",
-                      hideFieldToggle: false,
-                    ),
-                    SizedBox(height: 40,),
-                    /*
-                    AccountProceedButton(
-                      active: true,
-                      buttonText: "Sign up",
-                      updateFormCompletion: null,
-                    ),
-                     */
-                    SizedBox(height: 45,),
-                    AlternateOptionBorder(),
-                    SizedBox(height: 45,),
-                    AlternateSignUpButton(
-                      buttonText: "Log in",
-                      thirdPartyLogin: false,
-                      onTap: swapViewMethod,
-                    ),
-                  ],
-                )
+        child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: 780,
+            child: Column(
+              children: [
+                AccountInputField(
+                  fieldHint: "Username",
+                  hideFieldToggle: false,
+                ),
+                SizedBox(height: 20,),
+                AccountInputField(
+                  fieldHint: "Password",
+                  hideFieldToggle: false,
+                ),
+                SizedBox(height: 20,),
+                AccountInputField(
+                  fieldHint: "Repeat Password",
+                  hideFieldToggle: false,
+                ),
+                SizedBox(height: 40,),
+                AccountProceedButton(
+                  active: true,
+                  buttonText: "Sign up",
+                  updateFormCompletion: _formCompleted,
+                ),
+                SizedBox(height: 45,),
+                AlternateOptionBorder(),
+                SizedBox(height: 45,),
+                AlternateSignUpButton(
+                  buttonText: "Log in",
+                  thirdPartyLogin: false,
+                  onTap: swapViewMethod,
+                ),
+              ],
             )
         )
     );
@@ -147,82 +185,64 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
         alignment: Alignment.center,
-        child: Padding(
-            padding: EdgeInsets.only(top: 100),
-            child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 780,
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/icons/logo.png',
-                      scale: 1.7,
-                    ),
-                    SizedBox(height: 20,),
-                    Text(
-                      "Welcome back.",
-                      style: const TextStyle(
-                        fontFamily: 'InstrumentSans',
-                        color: Colors.black,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+        child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: 780,
+            child: Column(
+              children: [
+                AccountInputField(
+                  fieldHint: "Username",
+                  hideFieldToggle: false,
+                ),
+                SizedBox(height: 20,),
+                AccountInputField(
+                  fieldHint: "Password",
+                  hideFieldToggle: true,
+                ),
+                SizedBox(height: 10,),
+                Container(
+                    width: MediaQuery.of(context).size.width - 70,
+                    height: 30,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        "Forgot password?",
+                        style: const TextStyle(
+                          fontFamily: 'InstrumentSans',
+                          color: Color.fromRGBO(155, 155, 155, 1),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 40,),
-                    AccountInputField(
-                      fieldHint: "Username",
-                      hideFieldToggle: false,
-                    ),
-                    SizedBox(height: 20,),
-                    AccountInputField(
-                      fieldHint: "Password",
-                      hideFieldToggle: true,
-                    ),
-                    SizedBox(height: 10,),
-                    Container(
-                        width: MediaQuery.of(context).size.width - 70,
-                        height: 30,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "Forgot password?",
-                            style: const TextStyle(
-                              fontFamily: 'InstrumentSans',
-                              color: Color.fromRGBO(155, 155, 155, 1),
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        )
-                    ),
-                    SizedBox(height: 20,),
-                    AccountProceedButton(
-                        active: true,
-                        buttonText: "Log in",
-                        updateFormCompletion: updateFormCompletion,
-                    ),
-                    SizedBox(height: 45,),
-                    AlternateOptionBorder(),
-                    SizedBox(height: 45,),
-                    AlternateSignUpButton(
-                      buttonText: "Log in with Google",
-                      buttonIcon: 'assets/icons/googleSignin.png',
-                      thirdPartyLogin: true,
-                    ),
-                    SizedBox(height: 20,),
-                    AlternateSignUpButton(
-                      buttonText: "Log in with Apple",
-                      buttonIcon: 'assets/icons/appleSignin.png',
-                      thirdPartyLogin: true,
-                    ),
-                    SizedBox(height: 20,),
-                    AlternateSignUpButton(
-                      buttonText: "Sign up",
-                      thirdPartyLogin: false,
-                      onTap: swapViewMethod,
                     )
-                  ],
+                ),
+                SizedBox(height: 20,),
+                AccountProceedButton(
+                  active: true,
+                  buttonText: "Log in",
+                  updateFormCompletion: updateFormCompletion,
+                ),
+                SizedBox(height: 45,),
+                AlternateOptionBorder(),
+                SizedBox(height: 45,),
+                AlternateSignUpButton(
+                  buttonText: "Log in with Google",
+                  buttonIcon: 'assets/icons/googleSignin.png',
+                  thirdPartyLogin: true,
+                ),
+                SizedBox(height: 20,),
+                AlternateSignUpButton(
+                  buttonText: "Log in with Apple",
+                  buttonIcon: 'assets/icons/appleSignin.png',
+                  thirdPartyLogin: true,
+                ),
+                SizedBox(height: 20,),
+                AlternateSignUpButton(
+                  buttonText: "Sign up",
+                  thirdPartyLogin: false,
+                  onTap: swapViewMethod,
                 )
+              ],
             )
         )
     );
