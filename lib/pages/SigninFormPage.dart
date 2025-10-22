@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 class SignInFormPage extends StatefulWidget {
-  const SignInFormPage({super.key});
+
+  final ValueChanged<bool> updateFormCompletion;
+
+  const SignInFormPage({super.key, required this.updateFormCompletion});
 
   @override
   State<SignInFormPage> createState() => _SignInFormPageState();
 }
 
 class _SignInFormPageState extends State<SignInFormPage> {
+
   bool loginView = true;
 
   void switchView() {
@@ -51,7 +55,7 @@ class _SignInFormPageState extends State<SignInFormPage> {
                 );
               },
 
-              child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView,)
+              child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView, updateFormCompletion: widget.updateFormCompletion,)
                   : SignupForm(key: const ValueKey('signupForm'), swapViewMethod: switchView,
               ),
             )
@@ -109,10 +113,13 @@ class SignupForm extends StatelessWidget {
                       hideFieldToggle: false,
                     ),
                     SizedBox(height: 40,),
+                    /*
                     AccountProceedButton(
                       active: true,
                       buttonText: "Sign up",
+                      updateFormCompletion: null,
                     ),
+                     */
                     SizedBox(height: 45,),
                     AlternateOptionBorder(),
                     SizedBox(height: 45,),
@@ -131,9 +138,10 @@ class SignupForm extends StatelessWidget {
 
 class LoginForm extends StatelessWidget {
 
+  final ValueChanged<bool> updateFormCompletion;
   final VoidCallback? swapViewMethod;
 
-  const LoginForm({super.key, this.swapViewMethod});
+  const LoginForm({super.key, this.swapViewMethod, required this.updateFormCompletion});
 
   @override
   Widget build(BuildContext context) {
@@ -191,6 +199,7 @@ class LoginForm extends StatelessWidget {
                     AccountProceedButton(
                         active: true,
                         buttonText: "Log in",
+                        updateFormCompletion: updateFormCompletion,
                     ),
                     SizedBox(height: 45,),
                     AlternateOptionBorder(),
@@ -322,8 +331,9 @@ class AccountProceedButton extends StatefulWidget {
   final bool active;
   final String buttonText;
   final VoidCallback? onTap;
+  final ValueChanged<bool> updateFormCompletion;
 
-  AccountProceedButton({Key? key, required this.active, required this.buttonText, this.onTap}) : super(key: key);
+  AccountProceedButton({Key? key, required this.active, required this.buttonText, this.onTap, required this.updateFormCompletion}) : super(key: key);
 
   @override
   State<AccountProceedButton> createState() => _AccountProceedButton();
@@ -332,10 +342,14 @@ class AccountProceedButton extends StatefulWidget {
 
 class _AccountProceedButton extends State<AccountProceedButton> {
 
+  void onTap() {
+    widget.updateFormCompletion(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
           width: MediaQuery.of(context).size.width - 70,
           height: 50,

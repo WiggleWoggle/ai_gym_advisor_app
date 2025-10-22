@@ -20,9 +20,41 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class PageStack extends StatelessWidget {
+class PageStack extends StatefulWidget {
 
   const PageStack({super.key});
+
+  @override
+  State<PageStack> createState() => _PageStackState();
+}
+
+class _PageStackState extends State<PageStack> {
+
+  static int currentPage = 1;
+  static bool signinComplete = false;
+
+  void _changeCurrentPage(int newPage) {
+    setState(() {
+      currentPage = newPage;
+    });
+  }
+
+  void _updateSigninCompleted(bool completed) {
+    setState(() {
+      signinComplete = completed;
+    });
+  }
+
+  double getPageSlideOffset(int currentPage, int newPage) {
+
+    if (currentPage == 1 && newPage == 2) {
+      return 1;
+    } else if (currentPage == 1 && newPage == 0) {
+      return -1;
+    }
+
+    return 1;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +74,17 @@ class PageStack extends StatelessWidget {
                     ),
                   ),
                 ),
-                HomePage(),
+                AnimatedSlide(
+                  offset: currentPage == 1 ? Offset(0, 0) : Offset(getPageSlideOffset(1, currentPage), 0),
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOutCubic,
+                  child: HomePage(),
+                ),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
                     padding: EdgeInsets.only(bottom: 40),
-                    child: PageSwitcher()
+                    child: PageSwitcher(updatePage: _changeCurrentPage,)
                   ),
                 ),
                 Align(
@@ -57,7 +94,17 @@ class PageStack extends StatelessWidget {
                       child: LogoHeader()
                   ),
                 ),
-                //SignInFormPage()
+                AnimatedSlide(
+                  offset: signinComplete ? Offset(0, -1) : Offset(0, 0),
+                  duration: Duration(milliseconds: 600),
+                  curve: Curves.easeInOutCubic,
+                  child: AnimatedOpacity(
+                    opacity: signinComplete ? 0 : 1,
+                    duration: Duration(milliseconds: 600),
+                    curve: Curves.easeInOutCubic,
+                    child: SignInFormPage(updateFormCompletion: _updateSigninCompleted,),
+                  )
+                )
               ],
             ),
           ),
@@ -101,7 +148,9 @@ class LogoHeader extends StatelessWidget {
 
 class PageSwitcher extends StatefulWidget {
 
-  PageSwitcher({Key? key}) : super(key: key);
+  final ValueChanged<int> updatePage;
+
+  PageSwitcher({Key? key, required this.updatePage}) : super(key: key);
 
   @override
   State<PageSwitcher> createState() => _PageSwitcher();
@@ -114,6 +163,7 @@ class _PageSwitcher extends State<PageSwitcher> {
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
+      widget.updatePage(index);
     });
   }
 
