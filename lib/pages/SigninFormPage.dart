@@ -1,3 +1,4 @@
+import 'package:ai_gym_advisor_app/pages/auth/GoogleOauthOverlay.dart';
 import 'package:flutter/material.dart';
 
 class SignInFormPage extends StatefulWidget {
@@ -13,6 +14,14 @@ class SignInFormPage extends StatefulWidget {
 class _SignInFormPageState extends State<SignInFormPage> {
 
   bool loginView = true;
+  bool googleOverlay = false;
+  final GlobalKey<GoogleOauthOverlayState> _googleOverlayKey = GlobalKey();
+
+  void switchOverlay() {
+    setState(() {
+      googleOverlay = !googleOverlay;
+    });
+  }
 
   void switchView() {
     setState(() {
@@ -107,12 +116,36 @@ class _SignInFormPageState extends State<SignInFormPage> {
                     );
                   },
 
-                  child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView, updateFormCompletion: widget.updateFormCompletion,)
+                  child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView, googleOverlayMethod: switchOverlay, updateFormCompletion: widget.updateFormCompletion,)
                       : SignupForm(key: const ValueKey('signupForm'), swapViewMethod: switchView,
                   ),
                 )
               ],
             )
+          ),
+          IgnorePointer(
+            ignoring: !googleOverlay,
+            child: AnimatedOpacity(
+              opacity: googleOverlay ? 1 : 0,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOutCubic,
+              child: Container(
+                color: const Color.fromRGBO(217, 217, 217, 0.7),
+                child: GestureDetector(
+                  onTap: () {
+                    _googleOverlayKey.currentState?.resetForm();
+                    switchOverlay();
+                  },
+                ),
+              ),
+            ),
+          ),
+          IgnorePointer(
+            ignoring: !googleOverlay,
+            child: GoogleOauthOverlay(
+              key: _googleOverlayKey,
+              active: googleOverlay,
+            ),
           ),
         ],
       ),
@@ -136,32 +169,32 @@ class SignupForm extends StatelessWidget {
         alignment: Alignment.center,
         child: Container(
             width: MediaQuery.of(context).size.width,
-            height: 780,
+            height: MediaQuery.of(context).size.height * 0.62,
             child: Column(
               children: [
                 AccountInputField(
                   fieldHint: "Username",
                   hideFieldToggle: false,
                 ),
-                SizedBox(height: 20,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.05,),
                 AccountInputField(
                   fieldHint: "Password",
                   hideFieldToggle: false,
                 ),
-                SizedBox(height: 20,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.05,),
                 AccountInputField(
                   fieldHint: "Repeat Password",
                   hideFieldToggle: false,
                 ),
-                SizedBox(height: 40,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.1,),
                 AccountProceedButton(
                   active: true,
                   buttonText: "Sign up",
                   updateFormCompletion: _formCompleted,
                 ),
-                SizedBox(height: 45,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.11,),
                 AlternateOptionBorder(),
-                SizedBox(height: 45,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.11,),
                 AlternateSignUpButton(
                   buttonText: "Log in",
                   thirdPartyLogin: false,
@@ -178,8 +211,14 @@ class LoginForm extends StatelessWidget {
 
   final ValueChanged<bool> updateFormCompletion;
   final VoidCallback? swapViewMethod;
+  final VoidCallback? googleOverlayMethod;
 
-  const LoginForm({super.key, this.swapViewMethod, required this.updateFormCompletion});
+  const LoginForm({super.key, this.swapViewMethod, required this.updateFormCompletion, this.googleOverlayMethod});
+
+  bool filledFields() {
+
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,19 +226,19 @@ class LoginForm extends StatelessWidget {
         alignment: Alignment.center,
         child: Container(
             width: MediaQuery.of(context).size.width,
-            height: 780,
+            height: MediaQuery.of(context).size.height * 0.62,
             child: Column(
               children: [
                 AccountInputField(
                   fieldHint: "Username",
                   hideFieldToggle: false,
                 ),
-                SizedBox(height: 20,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.05,),
                 AccountInputField(
                   fieldHint: "Password",
                   hideFieldToggle: true,
                 ),
-                SizedBox(height: 10,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.025,),
                 Container(
                     width: MediaQuery.of(context).size.width - 70,
                     height: 30,
@@ -216,27 +255,28 @@ class LoginForm extends StatelessWidget {
                       ),
                     )
                 ),
-                SizedBox(height: 20,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.05,),
                 AccountProceedButton(
                   active: true,
                   buttonText: "Log in",
                   updateFormCompletion: updateFormCompletion,
                 ),
-                SizedBox(height: 45,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.11,),
                 AlternateOptionBorder(),
-                SizedBox(height: 45,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.11,),
                 AlternateSignUpButton(
                   buttonText: "Log in with Google",
                   buttonIcon: 'assets/icons/googleSignin.png',
                   thirdPartyLogin: true,
+                  onTap: googleOverlayMethod,
                 ),
-                SizedBox(height: 20,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.05,),
                 AlternateSignUpButton(
                   buttonText: "Log in with Apple",
                   buttonIcon: 'assets/icons/appleSignin.png',
                   thirdPartyLogin: true,
                 ),
-                SizedBox(height: 20,),
+                SizedBox(height: MediaQuery.of(context).size.width * 0.05,),
                 AlternateSignUpButton(
                   buttonText: "Sign up",
                   thirdPartyLogin: false,
@@ -278,8 +318,8 @@ class _AlternateSignUpButton extends State<AlternateSignUpButton> {
             ),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
-          width: 360,
-          height: 55,
+          width: MediaQuery.of(context).size.width * 0.84,
+          height: MediaQuery.of(context).size.width * 0.12,
           child: Align(
               alignment: Alignment.center,
               child: Row(
@@ -316,28 +356,28 @@ class AlternateOptionBorder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width - 70,
+      width: MediaQuery.of(context).size.width * 0.84,
       child: Row(
         children: [
           Container(
             height: 2,
-            width: MediaQuery.of(context).size.width - 280,
+            width: MediaQuery.of(context).size.width * 0.35,
             color: Color.fromRGBO(172, 172, 172, 1),
           ),
-          SizedBox(width: 15,),
+          SizedBox(width: MediaQuery.of(context).size.width * 0.028,),
           Text(
             "OR",
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'InstrumentSans',
               color: Color.fromRGBO(105, 93, 93, 1),
-              fontSize: 20,
+              fontSize: MediaQuery.of(context).size.width * 0.046,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(width: 15,),
+          SizedBox(width: MediaQuery.of(context).size.width * 0.028,),
           Container(
             height: 2,
-            width: MediaQuery.of(context).size.width - 280,
+            width: MediaQuery.of(context).size.width * 0.35,
             color: Color.fromRGBO(172, 172, 172, 1),
           ),
         ],
@@ -371,8 +411,8 @@ class _AccountProceedButton extends State<AccountProceedButton> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-          width: MediaQuery.of(context).size.width - 70,
-          height: 50,
+          width: MediaQuery.of(context).size.width * 0.84,
+          height: MediaQuery.of(context).size.width * 0.12,
           decoration: BoxDecoration(
             color: widget.active ? Color.fromRGBO(166, 173, 253, 1.0) : Color.fromRGBO(171, 171, 171, 1.0),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -381,10 +421,10 @@ class _AccountProceedButton extends State<AccountProceedButton> {
             alignment: Alignment.center,
             child: Text(
               widget.buttonText,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'InstrumentSans',
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: MediaQuery.of(context).size.height * 0.017,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -419,30 +459,36 @@ class _AccountInputField extends State<AccountInputField> {
         ),
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      width: 360,
+      height: MediaQuery.of(context).size.width * 0.12,
+      width: MediaQuery.of(context).size.width * 0.84,
       child: Stack(
         children: [
           TextField(
             keyboardType: TextInputType.number,
-            style: TextStyle(color: Color.fromRGBO(105, 93, 93, 1)),
+            style: TextStyle(
+                color: Color.fromRGBO(105, 93, 93, 1),
+                fontFamily: 'InstrumentSans',
+                fontWeight: FontWeight.bold,
+                fontSize: MediaQuery.of(context).size.height * 0.017
+            ),
             decoration: InputDecoration(
               hintText: widget.fieldHint,
               hintStyle: TextStyle(
                   color: Color.fromRGBO(105, 93, 93, 1),
                   fontFamily: 'InstrumentSans',
                   fontWeight: FontWeight.bold,
+                  fontSize: MediaQuery.of(context).size.height * 0.017
               ),
               border: InputBorder.none,
               contentPadding: EdgeInsets.only(left: 18.0),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(left: 320, top: 15),
-            child: widget.hideFieldToggle ? Icon(Icons.visibility_off, color: Color.fromRGBO(172, 172, 172, 1)) : Icon(Icons.remove_red_eye_rounded, color: Color.fromRGBO(172, 172, 172, 0)),
+            padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.75, top: MediaQuery.of(context).size.height * 0.015),
+            child: widget.hideFieldToggle ? Icon(Icons.visibility_off, color: Color.fromRGBO(172, 172, 172, 1), size: MediaQuery.of(context).size.height * 0.025,) : Icon(Icons.remove_red_eye_rounded, color: Color.fromRGBO(172, 172, 172, 0), size: MediaQuery.of(context).size.height * 0.025),
           )
         ],
       ),
     );
   }
 }
-
