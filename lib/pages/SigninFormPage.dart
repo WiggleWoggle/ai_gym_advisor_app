@@ -486,7 +486,7 @@ class _AccountInputField extends State<AccountInputField> {
           Padding(
             padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.75, top: MediaQuery.of(context).size.height * 0.015),
             child: widget.hideFieldToggle ? Icon(Icons.visibility_off, color: Color.fromRGBO(172, 172, 172, 1), size: MediaQuery.of(context).size.height * 0.025,) : Icon(Icons.remove_red_eye_rounded, color: Color.fromRGBO(172, 172, 172, 0), size: MediaQuery.of(context).size.height * 0.025),
-          )
+          ),
         ],
       ),
     );
