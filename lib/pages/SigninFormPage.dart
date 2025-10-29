@@ -1,3 +1,4 @@
+import 'package:ai_gym_advisor_app/pages/auth/AppleAuthOverlay.dart';
 import 'package:ai_gym_advisor_app/pages/auth/GoogleOauthOverlay.dart';
 import 'package:flutter/material.dart';
 
@@ -15,11 +16,26 @@ class _SignInFormPageState extends State<SignInFormPage> {
 
   bool loginView = true;
   bool googleOverlay = false;
+  bool appleOverlay = false;
   final GlobalKey<GoogleOauthOverlayState> _googleOverlayKey = GlobalKey();
+  final GlobalKey<AppleAuthOverlayState> _appleOverlayKey = GlobalKey();
 
-  void switchOverlay() {
+  void disableOverlays() {
+    setState(() {
+      googleOverlay = false;
+      appleOverlay = false;
+    });
+  }
+
+  void switchGoogleOverlay() {
     setState(() {
       googleOverlay = !googleOverlay;
+    });
+  }
+
+  void switchAppleOverlay() {
+    setState(() {
+      appleOverlay = !appleOverlay;
     });
   }
 
@@ -104,9 +120,7 @@ class _SignInFormPageState extends State<SignInFormPage> {
                     final isLogin = child.key == const ValueKey('loginForm');
 
                     final offsetAnimation = Tween<Offset>(
-                      begin: isLogin
-                          ? const Offset(-1.0, 0.0)
-                          : const Offset(1.0, 0.0),
+                      begin: isLogin ? const Offset(-1.0, 0.0) : const Offset(1.0, 0.0),
                       end: Offset.zero,
                     ).animate(animation);
 
@@ -116,7 +130,7 @@ class _SignInFormPageState extends State<SignInFormPage> {
                     );
                   },
 
-                  child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView, googleOverlayMethod: switchOverlay, updateFormCompletion: widget.updateFormCompletion,)
+                  child: loginView ? LoginForm(key: const ValueKey('loginForm'), swapViewMethod: switchView, googleOverlayMethod: switchGoogleOverlay, appleOverlayMethod: switchAppleOverlay, updateFormCompletion: widget.updateFormCompletion,)
                       : SignupForm(key: const ValueKey('signupForm'), swapViewMethod: switchView,
                   ),
                 )
@@ -124,9 +138,9 @@ class _SignInFormPageState extends State<SignInFormPage> {
             )
           ),
           IgnorePointer(
-            ignoring: !googleOverlay,
+            ignoring: (!googleOverlay) && (!appleOverlay),
             child: AnimatedOpacity(
-              opacity: googleOverlay ? 1 : 0,
+              opacity: getOpacity(),
               duration: const Duration(milliseconds: 400),
               curve: Curves.easeInOutCubic,
               child: Container(
@@ -134,7 +148,7 @@ class _SignInFormPageState extends State<SignInFormPage> {
                 child: GestureDetector(
                   onTap: () {
                     _googleOverlayKey.currentState?.resetForm();
-                    switchOverlay();
+                    disableOverlays();
                   },
                 ),
               ),
@@ -147,9 +161,25 @@ class _SignInFormPageState extends State<SignInFormPage> {
               active: googleOverlay,
             ),
           ),
+          IgnorePointer(
+            ignoring: !appleOverlay,
+            child: AppleAuthOverlay(
+              key: _appleOverlayKey,
+              active: appleOverlay,
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  double getOpacity() {
+
+    if (googleOverlay || appleOverlay) {
+      return 1;
+    }
+
+    return 0;
   }
 }
 
@@ -212,8 +242,9 @@ class LoginForm extends StatelessWidget {
   final ValueChanged<bool> updateFormCompletion;
   final VoidCallback? swapViewMethod;
   final VoidCallback? googleOverlayMethod;
+  final VoidCallback? appleOverlayMethod;
 
-  const LoginForm({super.key, this.swapViewMethod, required this.updateFormCompletion, this.googleOverlayMethod});
+  const LoginForm({super.key, this.swapViewMethod, required this.updateFormCompletion, this.googleOverlayMethod, this.appleOverlayMethod});
 
   bool filledFields() {
 
@@ -275,6 +306,7 @@ class LoginForm extends StatelessWidget {
                   buttonText: "Log in with Apple",
                   buttonIcon: 'assets/icons/appleSignin.png',
                   thirdPartyLogin: true,
+                  onTap: appleOverlayMethod,
                 ),
                 SizedBox(height: MediaQuery.of(context).size.width * 0.05,),
                 AlternateSignUpButton(
