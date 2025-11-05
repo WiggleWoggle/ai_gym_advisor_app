@@ -3,15 +3,37 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AppleAuthOverlay extends StatefulWidget {
-  final bool active;
 
-  const AppleAuthOverlay({super.key, required this.active});
+  final bool active;
+  final VoidCallback? closeMethod;
+
+  const AppleAuthOverlay({super.key, required this.active, this.closeMethod});
 
   @override
   State<AppleAuthOverlay> createState() => AppleAuthOverlayState();
 }
 
 class AppleAuthOverlayState extends State<AppleAuthOverlay> {
+
+  bool hideEmail = false;
+
+  void toggleEmailHiding() {
+    setState(() {
+      hideEmail = !hideEmail;
+    });
+  }
+
+  void shouldHideEmail() {
+    setState(() {
+      hideEmail = true;
+    });
+  }
+
+  void shouldShowEmail() {
+    setState(() {
+      hideEmail = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +85,10 @@ class AppleAuthOverlayState extends State<AppleAuthOverlay> {
                               borderRadius: BorderRadius.circular(50),
                               color: Color.fromRGBO(229, 229, 234, 1)
                           ),
-                          child: Icon(Icons.close, size: 22, color: Color.fromRGBO(140, 140, 144, 1),),
+                          child: GestureDetector(
+                            onTap: widget.closeMethod,
+                            child: Icon(Icons.close, size: 22, color: Color.fromRGBO(140, 140, 144, 1),),
+                          ),
                         ),
                       ],
                     ),
@@ -109,6 +134,8 @@ class AppleAuthOverlayState extends State<AppleAuthOverlay> {
                   icon: Icon(CupertinoIcons.person_solid),
                   showIcon: true,
                   checkBox: false,
+                  isChecked: false,
+                  hideEmailActionMethod: shouldShowEmail,
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.84,
@@ -122,6 +149,8 @@ class AppleAuthOverlayState extends State<AppleAuthOverlay> {
                   icon: Icon(CupertinoIcons.mail_solid),
                   showIcon: true,
                   checkBox: true,
+                  isChecked: !hideEmail,
+                  hideEmailActionMethod: shouldShowEmail,
                 ),
                 SignInChoice(
                   topRounding: 0,
@@ -131,6 +160,8 @@ class AppleAuthOverlayState extends State<AppleAuthOverlay> {
                   icon: Icon(CupertinoIcons.person_solid),
                   showIcon: false,
                   checkBox: true,
+                  isChecked: hideEmail,
+                  hideEmailActionMethod: shouldHideEmail,
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
@@ -154,16 +185,17 @@ class SignInChoice extends StatefulWidget {
   final Icon icon;
   final bool showIcon;
   final bool checkBox;
+  final bool isChecked;
 
-  const SignInChoice({super.key, required this.topRounding, required this.bottomRounding, required this.title, required this.subTitle, required this.icon, required this.showIcon, required this.checkBox});
+  final VoidCallback? hideEmailActionMethod;
+
+  const SignInChoice({super.key, required this.topRounding, required this.bottomRounding, required this.title, required this.subTitle, required this.icon, required this.showIcon, required this.checkBox, required this.isChecked, this.hideEmailActionMethod});
 
   @override
   State<SignInChoice> createState() => _SignInChoiceState();
 }
 
 class _SignInChoiceState extends State<SignInChoice> {
-
-  late bool isChecked = true;
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +270,8 @@ class _SignInChoiceState extends State<SignInChoice> {
                 ),
               if (widget.checkBox)
                 iosCheckbox(
-                  checked: false,
+                  checked: widget.isChecked,
+                  hideEmailActionMethod: widget.hideEmailActionMethod,
                 )
             ],
           ),
@@ -250,8 +283,9 @@ class _SignInChoiceState extends State<SignInChoice> {
 class iosCheckbox extends StatefulWidget {
 
   final bool checked;
+  final VoidCallback? hideEmailActionMethod;
 
-  const iosCheckbox({super.key, required this.checked});
+  const iosCheckbox({super.key, required this.checked, this.hideEmailActionMethod});
 
   @override
   State<iosCheckbox> createState() => _iosCheckboxState();
@@ -261,18 +295,46 @@ class _iosCheckboxState extends State<iosCheckbox> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.058,
-      height: MediaQuery.of(context).size.width * 0.058,
-      decoration: BoxDecoration(
-        color: widget.checked ? Color.fromRGBO(0, 122, 255, 1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(50),
-        border: Border.all(
-          color: widget.checked ? Colors.transparent : Color.fromRGBO(181, 181, 184, 1),
-          width: widget.checked ? 0 : 2.0,
+    return GestureDetector(
+      onTap: widget.hideEmailActionMethod,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 100),
+        curve: Curves.easeInOutCubic,
+        width: MediaQuery.of(context).size.width * 0.058,
+        height: MediaQuery.of(context).size.width * 0.058,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: widget.checked ? Colors.transparent : Color.fromRGBO(181, 181, 184, 1),
+            width: widget.checked ? 0 : 2.0,
+          ),
         ),
-      ),
-      child: Icon(Icons.check_rounded, color: Colors.white, size: 16,),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AnimatedScale(
+              scale: widget.checked ? 1.0 : 0,
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeInOutCubic,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.058,
+                height: MediaQuery.of(context).size.width * 0.058,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(0, 122, 255, 1),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+              ),
+            ),
+            AnimatedScale(
+              scale: widget.checked ? 1.0 : 0,
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeInOutCubic,
+              child: Icon(Icons.check_rounded, color: Colors.white, size: 16,),
+            ),
+          ],
+        )
+      )
     );
   }
 }

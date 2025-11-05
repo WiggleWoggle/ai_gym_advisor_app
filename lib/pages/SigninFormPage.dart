@@ -24,6 +24,7 @@ class _SignInFormPageState extends State<SignInFormPage> {
     setState(() {
       googleOverlay = false;
       appleOverlay = false;
+      _googleOverlayKey.currentState?.resetForm();
     });
   }
 
@@ -147,7 +148,6 @@ class _SignInFormPageState extends State<SignInFormPage> {
                 color: const Color.fromRGBO(217, 217, 217, 0.7),
                 child: GestureDetector(
                   onTap: () {
-                    _googleOverlayKey.currentState?.resetForm();
                     disableOverlays();
                   },
                 ),
@@ -166,6 +166,7 @@ class _SignInFormPageState extends State<SignInFormPage> {
             child: AppleAuthOverlay(
               key: _appleOverlayKey,
               active: appleOverlay,
+              closeMethod: disableOverlays,
             ),
           ),
         ],

@@ -16,7 +16,7 @@ class GoogleOauthOverlayState extends State<GoogleOauthOverlay> {
   int formPage = 0;
   int maxPage = 1;
 
-  final GlobalKey<_GoogleInputFieldWidgetState> emailFieldKey = GlobalKey();
+    final GlobalKey<_GoogleInputFieldWidgetState> emailFieldKey = GlobalKey();
   final GlobalKey<_GoogleInputFieldWidgetState> passwordFieldKey = GlobalKey();
 
   void navigateFormTo(int page) {
@@ -35,7 +35,9 @@ class GoogleOauthOverlayState extends State<GoogleOauthOverlay> {
 
   void resetForm() {
     emailFieldKey.currentState?.clearText();
+    emailFieldKey.currentState?.resetInputState();
     passwordFieldKey.currentState?.clearText();
+    passwordFieldKey.currentState?.resetInputState();
     setState(() {
       formPage = 0;
     });
@@ -88,7 +90,10 @@ class GoogleOauthOverlayState extends State<GoogleOauthOverlay> {
                       ),
                       child: NextButtonWidget(
                         progressViewMethod: () {
-                          progressForm();
+                          final valid = emailFieldKey.currentState?.validateEmail() ?? false;
+                          if (valid) {
+                            progressForm();
+                          }
                         },
                       ),
                     ),
@@ -189,7 +194,6 @@ class _PasswordFormPageState extends State<PasswordFormPage> {
               key: widget.passwordKey,
               inputHeader: "Enter your password",
               invalidInputText: "Wrong password. Try again or click Forgot Password.",
-              invalidInput: true,
               obscureText: true,
               controller: passwordController,
             ),
@@ -301,9 +305,8 @@ class _EmailFormPageState extends State<EmailFormPage> {
         SizedBox(height: MediaQuery.of(context).size.height * 0.0325),
         GoogleInputFieldWidget(
           inputHeader: "Email or phone",
-          invalidInputText: "Enter an email or phone number",
+          invalidInputText: "Enter a valid email or phone number",
           obscureText: false,
-          invalidInput: false,
           key: widget.emailKey,
           controller: emailController,
         ),
@@ -425,11 +428,10 @@ class GoogleInputFieldWidget extends StatefulWidget {
   final String inputHeader;
   final String invalidInputText;
   final bool obscureText;
-  final bool invalidInput;
 
   final TextEditingController controller;
 
-  const GoogleInputFieldWidget({super.key, required this.inputHeader, required this.obscureText, required this.invalidInputText, required this.invalidInput, required this.controller});
+  const GoogleInputFieldWidget({super.key, required this.inputHeader, required this.obscureText, required this.invalidInputText, required this.controller});
 
   @override
   State<GoogleInputFieldWidget> createState() => _GoogleInputFieldWidgetState();
@@ -440,6 +442,55 @@ class _GoogleInputFieldWidgetState extends State<GoogleInputFieldWidget> {
   bool headerActivated = false;
   late TextEditingController _controller;
   late FocusNode _focusNode;
+  late bool _invalidInput = false;
+
+  String getText() => _controller.text;
+
+  bool validateEmail() {
+    if (_controller.text.trim().isEmpty) {
+      setState(() {
+        _invalidInput = true;
+      });
+      return false;
+    } else {
+      if (matchesEmailRegex(_controller.text)) {
+        setState(() {
+          _invalidInput = false;
+        });
+        return true;
+      } else if (matchesPhoneRegex(_controller.text)) {
+        setState(() {
+          _invalidInput = false;
+        });
+        return true;
+      } else {
+        setState(() {
+          _invalidInput = true;
+        });
+        return false;
+      }
+    }
+  }
+
+  bool matchesPhoneRegex(String text) {
+
+    final phoneRegex = RegExp(r'^\+?[0-9]{7,15}$');
+
+    return phoneRegex.hasMatch(text);
+  }
+
+  bool matchesEmailRegex(String text) {
+
+    final emailRegex = RegExp(r"^[\w\.\+\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z]{2,}$");
+
+    return emailRegex.hasMatch(text);
+  }
+
+  void resetInputState() {
+    setState(() {
+      _invalidInput = false;
+    });
+  }
 
   @override
   void initState() {
@@ -561,8 +612,8 @@ class _GoogleInputFieldWidgetState extends State<GoogleInputFieldWidget> {
             ],
           ),
           AnimatedOpacity(
-            opacity: widget.invalidInput ? 1 : 0,
-            duration: Duration(milliseconds: 300),
+            opacity: _invalidInput ? 1 : 0,
+            duration: Duration(milliseconds: 200),
             curve: Curves.easeInOutCubic,
             child: Container(
               width: MediaQuery.of(context).size.width * 0.91,
@@ -590,7 +641,7 @@ class _GoogleInputFieldWidgetState extends State<GoogleInputFieldWidget> {
 
   Color currentColor() {
 
-    if (widget.invalidInput) {
+    if (_invalidInput) {
       return Color.fromRGBO(255, 126, 117, 1);
     } else {
       if (headerActivated) {
