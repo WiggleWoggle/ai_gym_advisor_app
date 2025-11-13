@@ -9,6 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,11 +35,51 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+                padding: EdgeInsets.only(top: 70),
+                child: LogoHeader()
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
+class LogoHeader extends StatelessWidget {
+
+  const LogoHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 200,
+      height: 40,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/icons/logo.png',
+            scale: 6,
+          ),
+          SizedBox(width: 12,),
+          Text(
+            "GymAdvisor",
+            style: const TextStyle(
+              fontFamily: 'InstrumentSans',
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 
 class RoutineWidget extends StatefulWidget {
   const RoutineWidget({super.key});
