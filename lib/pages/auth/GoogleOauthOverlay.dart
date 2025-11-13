@@ -16,12 +16,20 @@ class GoogleOauthOverlayState extends State<GoogleOauthOverlay> {
   int formPage = 0;
   int maxPage = 1;
 
-    final GlobalKey<_GoogleInputFieldWidgetState> emailFieldKey = GlobalKey();
+  String emailInput = "";
+
+  final GlobalKey<_GoogleInputFieldWidgetState> emailFieldKey = GlobalKey();
   final GlobalKey<_GoogleInputFieldWidgetState> passwordFieldKey = GlobalKey();
 
   void navigateFormTo(int page) {
     setState(() {
       formPage = page;
+    });
+  }
+
+  void updateEmailInput(String newEmail) {
+    setState(() {
+      emailInput = newEmail;
     });
   }
 
@@ -81,7 +89,10 @@ class GoogleOauthOverlayState extends State<GoogleOauthOverlay> {
                       offset: Offset(MediaQuery.of(context).size.width * formSlide(1), 0),
                       curve: Curves.easeInOutCubic,
                       duration: const Duration(milliseconds: 500),
-                      child: PasswordFormPage(passwordKey: passwordFieldKey),
+                      child: PasswordFormPage(
+                        passwordKey: passwordFieldKey,
+                          emailText: emailFieldKey.currentState?.getText() ?? ""
+                      ),
                     ),
                     Padding(
                       padding: EdgeInsets.only(
@@ -132,8 +143,9 @@ class GoogleOauthOverlayState extends State<GoogleOauthOverlay> {
 class PasswordFormPage extends StatefulWidget {
 
   final GlobalKey<_GoogleInputFieldWidgetState> passwordKey;
+  final String emailText;
 
-  const PasswordFormPage({super.key, required this.passwordKey});
+  const PasswordFormPage({super.key, required this.passwordKey, required this.emailText});
 
   @override
   State<PasswordFormPage> createState() => _PasswordFormPageState();
@@ -142,7 +154,14 @@ class PasswordFormPage extends StatefulWidget {
 class _PasswordFormPageState extends State<PasswordFormPage> {
 
   bool validPasswordInput = true;
+  bool showPassword = false;
   final TextEditingController passwordController = TextEditingController();
+
+  void toggleShowPassword() {
+    setState(() {
+      showPassword = !showPassword;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +196,7 @@ class _PasswordFormPageState extends State<PasswordFormPage> {
                       ),
                       SizedBox(width: MediaQuery.of(context).size.width * 0.025,),
                       Text(
-                        "johndoe@gmail.com",
+                        widget.emailText,
                         style: TextStyle(
                           fontFamily: 'Roboto',
                           color: Colors.black,
@@ -194,7 +213,7 @@ class _PasswordFormPageState extends State<PasswordFormPage> {
               key: widget.passwordKey,
               inputHeader: "Enter your password",
               invalidInputText: "Wrong password. Try again or click Forgot Password.",
-              obscureText: true,
+              obscureText: !showPassword,
               controller: passwordController,
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.025,),
@@ -228,7 +247,9 @@ class _PasswordFormPageState extends State<PasswordFormPage> {
             child: Container(
               width: MediaQuery.of(context).size.width * 0.91,
               height: MediaQuery.of(context).size.height * 0.037,
-              child: PasswordToggleWidget(),
+              child: PasswordToggleWidget(
+                toggleMethod: toggleShowPassword,
+              ),
             ),
           )
         )
@@ -375,7 +396,9 @@ class _EmailFormPageState extends State<EmailFormPage> {
 
 class PasswordToggleWidget extends StatefulWidget {
 
-  const PasswordToggleWidget({super.key});
+  final VoidCallback? toggleMethod;
+
+  const PasswordToggleWidget({super.key, required this.toggleMethod});
 
   @override
   State<PasswordToggleWidget> createState() => _PasswordToggleWidgetState();
@@ -404,7 +427,9 @@ class _PasswordToggleWidgetState extends State<PasswordToggleWidget> {
             onChanged: (bool? value) {
               setState(() {
                 showPassword = value!;
+                widget.toggleMethod;
               });
+              widget.toggleMethod?.call();
             },
             activeColor: const Color.fromRGBO(26, 115, 232, 1),
             checkColor: Colors.white,

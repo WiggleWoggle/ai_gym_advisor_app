@@ -1,3 +1,4 @@
+import 'package:ai_gym_advisor_app/pages/main/AssistantDirectMessagePage.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:ai_gym_advisor_app/pages/SigninFormPage.dart';
@@ -48,12 +49,12 @@ class _PageStackState extends State<PageStack> {
   double getPageSlideOffset(int currentPage, int newPage) {
 
     if (currentPage == 1 && newPage == 2) {
-      return 1;
-    } else if (currentPage == 1 && newPage == 0) {
       return -1;
+    } else if (currentPage == 1 && newPage == 0) {
+      return 1;
     }
 
-    return 1;
+    return -1;
   }
 
   @override
@@ -76,22 +77,21 @@ class _PageStackState extends State<PageStack> {
                 ),
                 AnimatedSlide(
                   offset: currentPage == 1 ? Offset(0, 0) : Offset(getPageSlideOffset(1, currentPage), 0),
-                  duration: Duration(milliseconds: 300),
+                  duration: Duration(milliseconds: 500),
                   curve: Curves.easeInOutCubic,
                   child: HomePage(),
+                ),
+                AnimatedSlide(
+                  offset: currentPage == 0 ? Offset(0, 0) : Offset(getPageSlideOffset(1, currentPage), 0),
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOutCubic,
+                  child: AssistantDirectMessagePage(),
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
                     padding: EdgeInsets.only(bottom: 40),
                     child: PageSwitcher(updatePage: _changeCurrentPage,)
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                      padding: EdgeInsets.only(top: 70),
-                      child: LogoHeader()
                   ),
                 ),
                 AnimatedSlide(
@@ -114,37 +114,6 @@ class _PageStackState extends State<PageStack> {
   }
 }
 
-class LogoHeader extends StatelessWidget {
-
-  const LogoHeader({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 200,
-      height: 40,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/icons/logo.png',
-            scale: 6,
-          ),
-          SizedBox(width: 12,),
-          Text(
-            "GymAdvisor",
-            style: const TextStyle(
-              fontFamily: 'InstrumentSans',
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
 
 class PageSwitcher extends StatefulWidget {
 
