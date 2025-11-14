@@ -37,36 +37,33 @@ class AppleAuthOverlayState extends State<AppleAuthOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 1.0,
-      width: MediaQuery.of(context).size.width * 1.0,
+    return AnimatedSlide(
+      offset: Offset(0, widget.active ? 0 : 1),
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOutCubic,
       child: Align(
         alignment: Alignment.bottomCenter,
-        child: AnimatedSlide(
-          offset: Offset(0, widget.active ? 0 : 1),
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeInOutCubic,
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.57,
-            width: MediaQuery.of(context).size.width * 1.0,
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(242, 242, 247, 1),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: const BoxDecoration(
+            color: Color.fromRGBO(242, 242, 247, 1),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
             ),
-            child: Column(
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.84,
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.87,
-                    height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.02,
+            ),
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.065),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -75,105 +72,98 @@ class AppleAuthOverlayState extends State<AppleAuthOverlay> {
                           style: TextStyle(
                             fontFamily: 'SF_Bold',
                             color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width * 0.045,
+                            fontSize:
+                            MediaQuery.of(context).size.width * 0.045,
                           ),
                         ),
                         Container(
                           width: MediaQuery.of(context).size.width * 0.08,
                           height: MediaQuery.of(context).size.width * 0.08,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              color: Color.fromRGBO(229, 229, 234, 1)
+                            borderRadius: BorderRadius.circular(50),
+                            color: Color.fromRGBO(229, 229, 234, 1),
                           ),
                           child: GestureDetector(
                             onTap: widget.closeMethod,
-                            child: Icon(Icons.close, size: 22, color: Color.fromRGBO(140, 140, 144, 1),),
+                            child: Icon(
+                              Icons.close,
+                              size: 22,
+                              color: Color.fromRGBO(140, 140, 144, 1),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.84,
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    "assets/icons/appLogo.png",
-                    scale: 5,
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.84,
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.84,
-                  height: MediaQuery.of(context).size.height * 0.05,
-                  child: Text(
-                    "Create an account for GymAdvisor using your Apple Account.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'SF_Regular',
-                      color: Colors.black,
-                      fontSize: MediaQuery.of(context).size.width * 0.035,
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      "assets/icons/appLogo.png",
+                      scale: 5,
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.84,
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                SignInChoice(
-                  topRounding: 12,
-                  bottomRounding: 12,
-                  title: "Name",
-                  subTitle: "John Doe",
-                  icon: Icon(CupertinoIcons.person_solid),
-                  showIcon: true,
-                  checkBox: false,
-                  isChecked: false,
-                  hideEmailActionMethod: shouldShowEmail,
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.84,
-                  height: MediaQuery.of(context).size.height * 0.013,
-                ),
-                SignInChoice(
-                  topRounding: 12,
-                  bottomRounding: 0,
-                  title: "Share My Email",
-                  subTitle: "johndoe@icloud.com",
-                  icon: Icon(CupertinoIcons.mail_solid),
-                  showIcon: true,
-                  checkBox: true,
-                  isChecked: !hideEmail,
-                  hideEmailActionMethod: shouldShowEmail,
-                ),
-                SignInChoice(
-                  topRounding: 0,
-                  bottomRounding: 12,
-                  title: "Hide My Email",
-                  subTitle: "Forward To: johndoe@icloud.com",
-                  icon: Icon(CupertinoIcons.person_solid),
-                  showIcon: false,
-                  checkBox: true,
-                  isChecked: hideEmail,
-                  hideEmailActionMethod: shouldHideEmail,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
-                  child: iosContinue(),
-                )
-              ],
-            )
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.08),
+                    child: Text(
+                      "Create an account for GymAdvisor using your Apple Account.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'SF_Regular',
+                        color: Colors.black,
+                        fontSize: MediaQuery.of(context).size.width * 0.035,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  SignInChoice(
+                    topRounding: 12,
+                    bottomRounding: 12,
+                    title: "Name",
+                    subTitle: "John Doe",
+                    icon: Icon(CupertinoIcons.person_solid),
+                    showIcon: true,
+                    checkBox: false,
+                    isChecked: false,
+                    hideEmailActionMethod: shouldShowEmail,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.013),
+                  SignInChoice(
+                    topRounding: 12,
+                    bottomRounding: 0,
+                    title: "Share My Email",
+                    subTitle: "johndoe@icloud.com",
+                    icon: Icon(CupertinoIcons.mail_solid),
+                    showIcon: true,
+                    checkBox: true,
+                    isChecked: !hideEmail,
+                    hideEmailActionMethod: shouldShowEmail,
+                  ),
+                  SignInChoice(
+                    topRounding: 0,
+                    bottomRounding: 12,
+                    title: "Hide My Email",
+                    subTitle: "Forward To: johndoe@icloud.com",
+                    icon: Icon(CupertinoIcons.person_solid),
+                    showIcon: false,
+                    checkBox: true,
+                    isChecked: hideEmail,
+                    hideEmailActionMethod: shouldHideEmail,
+                  ),
+
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  iosContinue(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
+
 }
 
 class SignInChoice extends StatefulWidget {

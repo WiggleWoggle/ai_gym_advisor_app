@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:ai_gym_advisor_app/pages/SigninFormPage.dart';
 import 'package:ai_gym_advisor_app/pages/main/HomePage.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(DevicePreview(builder: (context) => MyApp()));
@@ -34,6 +35,18 @@ class _PageStackState extends State<PageStack> {
   static int currentPage = 1;
   static bool signinComplete = false;
 
+  bool isDarkMode = true;
+
+  void toggleDarkMode() {
+    setState(() {
+      isDarkMode = !isDarkMode;
+    });
+  }
+
+  bool getIsDarkMode() {
+    return !isDarkMode;
+  }
+
   void _changeCurrentPage(int newPage) {
     setState(() {
       currentPage = newPage;
@@ -59,7 +72,6 @@ class _PageStackState extends State<PageStack> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Stack(
         children: [
@@ -76,22 +88,28 @@ class _PageStackState extends State<PageStack> {
                   ),
                 ),
                 AnimatedSlide(
+                  offset: currentPage == 0 ? Offset(0, 0) : Offset(getPageSlideOffset(1, currentPage), 0),
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOutCubic,
+                  child: AssistantDirectMessagePage(
+                    toggleDarkMode: toggleDarkMode,
+                    getIsDarkMode: getIsDarkMode,
+                  ),
+                ),
+                AnimatedSlide(
                   offset: currentPage == 1 ? Offset(0, 0) : Offset(getPageSlideOffset(1, currentPage), 0),
                   duration: Duration(milliseconds: 500),
                   curve: Curves.easeInOutCubic,
                   child: HomePage(),
                 ),
-                AnimatedSlide(
-                  offset: currentPage == 0 ? Offset(0, 0) : Offset(getPageSlideOffset(1, currentPage), 0),
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.easeInOutCubic,
-                  child: AssistantDirectMessagePage(),
-                ),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
                     padding: EdgeInsets.only(bottom: 40),
-                    child: PageSwitcher(updatePage: _changeCurrentPage,)
+                    child: PageSwitcher(
+                      updatePage: _changeCurrentPage,
+                      getIsDarkMode: getIsDarkMode,
+                    )
                   ),
                 ),
                 AnimatedSlide(
@@ -118,8 +136,9 @@ class _PageStackState extends State<PageStack> {
 class PageSwitcher extends StatefulWidget {
 
   final ValueChanged<int> updatePage;
+  final Function()? getIsDarkMode;
 
-  PageSwitcher({Key? key, required this.updatePage}) : super(key: key);
+  PageSwitcher({Key? key, required this.updatePage, required this.getIsDarkMode}) : super(key: key);
 
   @override
   State<PageSwitcher> createState() => _PageSwitcher();
@@ -142,11 +161,13 @@ class _PageSwitcher extends State<PageSwitcher> {
     final double totalWidth = MediaQuery.of(context).size.width - 200;
     final double spacing = totalWidth / 3;
 
-    return Container(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 400),
+      curve: Curves.easeInOutCubic,
       width: totalWidth,
       height: 60,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: widget.getIsDarkMode!() ? Color.fromRGBO(69, 69, 69, 1) : Colors.white,
         borderRadius: const BorderRadius.all(Radius.circular(80)),
         boxShadow: [
           BoxShadow(
@@ -202,8 +223,8 @@ class _PageSwitcher extends State<PageSwitcher> {
       onTap: () => onItemTapped(index),
       child: TweenAnimationBuilder<Color?>(
         tween: ColorTween(
-          begin: isSelected ? Colors.black : Colors.white,
-          end: isSelected ? Colors.white : Colors.black,
+          begin: isSelected ? widget.getIsDarkMode!() ? Colors.white : Colors.white : widget.getIsDarkMode!() ? Colors.white : Colors.white,
+          end: isSelected ? widget.getIsDarkMode!() ? Colors.white : Colors.white : widget.getIsDarkMode!() ? Color.fromRGBO(110, 110, 110, 1) : Colors.black,
         ),
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOutCubicEmphasized,
