@@ -100,7 +100,7 @@ class _SignInFormPageState extends State<SignInFormPage> {
                           duration: Duration(milliseconds: 400),
                           curve: Curves.easeInOutCubic,
                           child: Text(
-                            "Welcome to GymAdvisor.",
+                            "Welcome to FitnessAdvisor.",
                             style: const TextStyle(
                               fontFamily: 'InstrumentSans',
                               color: Colors.black,

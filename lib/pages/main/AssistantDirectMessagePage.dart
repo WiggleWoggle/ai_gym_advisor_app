@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ai_gym_advisor_app/pages/main/AssistantDirectMessagePage.dart';
+
+import '../aiassistant/AIChatMessages.dart';
 
 class AssistantDirectMessagePage extends StatefulWidget {
 
@@ -1699,40 +1702,104 @@ class LogoHeader extends StatelessWidget {
 }
 
 class ConversationColumn extends StatelessWidget {
-
   final bool isDarkMode;
 
   const ConversationColumn({super.key, required this.isDarkMode});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width * 0.88,
-      height: MediaQuery.of(context).size.height * 1,
-      child: Column(
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.15,
-            width: MediaQuery.of(context).size.height * 0.15,
-          ),
-          TextMessageBubble(
-              sent: false,
-              messageContent: "What can I help you with today?",
-              isDarkMode: isDarkMode
-          ),
-          TextMessageBubble(
-              sent: true,
-              messageContent: "Can you give me some workouts that target rear delts?",
-              isDarkMode: isDarkMode
-          ),
-          TextMessageBubble(
-              sent: false,
-              messageContent: "Sounds good! Here’s a list of workouts that target rear delts! \n\n- Archer pulls \n-Reverse flyes \n-Dumbbell rows",
-              isDarkMode: isDarkMode
-          ),
-        ],
+      child: ListView.builder(
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.height * 0.15,
+          bottom: 80,
+        ),
+        itemCount: messages.length,
+        itemBuilder: (context, index) {
+          final msg = messages[index];
+
+          bool showTimestampDivider = false;
+
+          if (index == 0) {
+            showTimestampDivider = true;
+          } else {
+            final prev = messages[index - 1];
+
+            final prevDate = DateTime(prev.timestamp.year, prev.timestamp.month, prev.timestamp.day);
+            final currDate = DateTime(msg.timestamp.year, msg.timestamp.month, msg.timestamp.day);
+
+            if (prevDate != currDate) {
+              showTimestampDivider = true;
+            }
+          }
+
+          return Column(
+            children: [
+              if (showTimestampDivider)
+                TimeStampDividerWidget(timestamp: msg.timestamp),
+
+              TextMessageBubble(
+                sent: msg.sent,
+                messageContent: msg.content,
+                isDarkMode: isDarkMode,
+                timestamp: msg.timestamp,
+              ),
+            ],
+          );
+        },
       ),
     );
+  }
+}
+
+class TimeStampDividerWidget extends StatelessWidget {
+
+  final DateTime timestamp;
+
+  const TimeStampDividerWidget({super.key, required this.timestamp});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 1,
+      height: MediaQuery.of(context).size.height * 0.07,
+      child: Align(
+        alignment: Alignment.center,
+        child: Text(
+          getTimeStampAsString(),
+          style: TextStyle(
+            fontFamily: 'InstrumentSans',
+            color: Color.fromRGBO(75, 75, 75, 1),
+            fontSize: MediaQuery.of(context).size.width * 0.036,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String getTimeStampAsString() {
+
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final yesterday = today.subtract(Duration(days: 1));
+    final dateToCheck = DateTime(timestamp.year, timestamp.month, timestamp.day);
+
+    if (dateToCheck == today) {
+      return "Today";
+    }
+
+    if (dateToCheck == yesterday) {
+      return "Yesterday";
+    }
+
+    int day = timestamp.day;
+    int month = timestamp.month;
+    int year = timestamp.year;
+
+    String date = month.toString() + "/" + day.toString() + "/" + year.toString();
+
+    return date;
   }
 }
 
@@ -1741,77 +1808,81 @@ class TextMessageBubble extends StatelessWidget {
   final bool sent;
   final bool isDarkMode;
 
+  final DateTime timestamp;
+
   final String messageContent;
 
-  const TextMessageBubble({super.key, required this.sent, required this.messageContent, required this.isDarkMode});
+  const TextMessageBubble({super.key, required this.sent, required this.messageContent, required this.isDarkMode, required this.timestamp});
 
   @override
   Widget build(BuildContext context) {
     final maxBubbleWidth = MediaQuery.of(context).size.width * 0.7;
 
-    return Row(
-      mainAxisAlignment: sent ? MainAxisAlignment.end : MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Column(
-          crossAxisAlignment: sent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).size.height * 0.005,
-                left: MediaQuery.of(context).size.width * 0.035,
-                right: MediaQuery.of(context).size.width * 0.035,
-              ),
-              child: Text(
-                sent ? "You" : "AI Advisor",
-                style: TextStyle(
-                  fontFamily: 'InstrumentSans',
-                  color: isDarkMode ? Colors.white : Color.fromRGBO(140, 140, 140, 1),
-                  fontSize: MediaQuery.of(context).size.width * 0.034,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: maxBubbleWidth,
-              ),
-              decoration: BoxDecoration(
-                color: sent
-                    ? isDarkMode ? Color.fromRGBO(115, 147, 209, 1) : Color.fromRGBO(196, 230, 255, 1)
-                    : isDarkMode ? Color.fromRGBO(77, 77, 77, 1) : Color.fromRGBO(237, 237, 237, 1),
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(14),
-                  topRight: const Radius.circular(14),
-                  bottomRight:
-                  sent ? const Radius.circular(0) : const Radius.circular(14),
-                  bottomLeft:
-                  sent ? const Radius.circular(14) : const Radius.circular(0),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.height * 0.015,
-                  horizontal: MediaQuery.of(context).size.width * 0.04,
+    return GestureDetector(
+      child: Row(
+        mainAxisAlignment: sent ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Column(
+            crossAxisAlignment: sent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).size.height * 0.005,
+                  left: MediaQuery.of(context).size.width * 0.035,
+                  right: MediaQuery.of(context).size.width * 0.035,
                 ),
                 child: Text(
-                  messageContent,
+                  sent ? "You" : "AI Advisor",
                   style: TextStyle(
                     fontFamily: 'InstrumentSans',
-                    color: isDarkMode ? Colors.white : Color.fromRGBO(65, 65, 65, 1),
+                    color: isDarkMode ? Colors.white : Color.fromRGBO(140, 140, 140, 1),
                     fontSize: MediaQuery.of(context).size.width * 0.034,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.width * 0.04,
-              width: MediaQuery.of(context).size.width * 0.04,
-            ),
-          ],
-        ),
-      ],
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: maxBubbleWidth,
+                ),
+                decoration: BoxDecoration(
+                  color: sent
+                      ? isDarkMode ? Color.fromRGBO(115, 147, 209, 1) : Color.fromRGBO(196, 230, 255, 1)
+                      : isDarkMode ? Color.fromRGBO(77, 77, 77, 1) : Color.fromRGBO(237, 237, 237, 1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(14),
+                    topRight: const Radius.circular(14),
+                    bottomRight:
+                    sent ? const Radius.circular(0) : const Radius.circular(14),
+                    bottomLeft:
+                    sent ? const Radius.circular(14) : const Radius.circular(0),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.015,
+                    horizontal: MediaQuery.of(context).size.width * 0.04,
+                  ),
+                  child: Text(
+                    messageContent,
+                    style: TextStyle(
+                      fontFamily: 'InstrumentSans',
+                      color: isDarkMode ? Colors.white : Color.fromRGBO(65, 65, 65, 1),
+                      fontSize: MediaQuery.of(context).size.width * 0.034,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.width * 0.04,
+                width: MediaQuery.of(context).size.width * 0.04,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

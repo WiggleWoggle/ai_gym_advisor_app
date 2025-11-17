@@ -313,7 +313,7 @@ class _EmailFormPageState extends State<EmailFormPage> {
             ),
             SizedBox(width: MediaQuery.of(context).size.width * 0.012,),
             Text(
-              "GymAdvisor",
+              "FitnessAdvisor",
               style: TextStyle(
                 fontFamily: 'Roboto',
                 fontWeight: FontWeight.bold,

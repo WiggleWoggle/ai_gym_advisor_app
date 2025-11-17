@@ -66,7 +66,7 @@ class LogoHeader extends StatelessWidget {
           ),
           SizedBox(width: 12,),
           Text(
-            "GymAdvisor",
+            "FitnessAdvisor",
             style: const TextStyle(
               fontFamily: 'InstrumentSans',
               color: Colors.black,

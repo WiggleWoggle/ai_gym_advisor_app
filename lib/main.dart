@@ -3,9 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:ai_gym_advisor_app/pages/SigninFormPage.dart';
 import 'package:ai_gym_advisor_app/pages/main/HomePage.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
+
+//gemini key
+const apiKey = 'AIzaSyDRR4-61XSGjV20X_cm098sqAeNw0WTFPY';
 
 void main() {
+
+  Gemini.init(apiKey: apiKey);
+
   runApp(DevicePreview(builder: (context) => MyApp()));
 }
 

@@ -108,7 +108,7 @@ class AppleAuthOverlayState extends State<AppleAuthOverlay> {
                     padding: EdgeInsets.symmetric(
                         horizontal: MediaQuery.of(context).size.width * 0.08),
                     child: Text(
-                      "Create an account for GymAdvisor using your Apple Account.",
+                      "Create an account for FitnessAdvisor using your Apple Account.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'SF_Regular',
